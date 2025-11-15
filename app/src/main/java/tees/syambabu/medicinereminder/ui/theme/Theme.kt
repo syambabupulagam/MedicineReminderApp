@@ -1,6 +1,5 @@
-package syambabu.project.medicinereminder.ui.theme
+package tees.syambabu.medicinereminder.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

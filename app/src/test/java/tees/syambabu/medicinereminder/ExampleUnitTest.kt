@@ -1,4 +1,4 @@
-package syambabu.project.medicinereminder
+package tees.syambabu.medicinereminder
 
 import org.junit.Test
 

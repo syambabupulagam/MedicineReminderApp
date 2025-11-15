@@ -1,4 +1,4 @@
-package syambabu.project.medicinereminder.ui.theme
+package tees.syambabu.medicinereminder.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

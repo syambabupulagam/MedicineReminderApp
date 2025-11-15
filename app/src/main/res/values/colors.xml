@@ -10,4 +10,9 @@
 
     <color name="evergreen">#31473A</color>
     <color name="misty_mint">#EDF4F2</color>
+
+    <color name="SkyBlue">#31473A</color>
+    <color name="PureWhite">#EDF4F2</color>
+
+    <color name="white_50">#80FFFFFF</color>
 </resources>

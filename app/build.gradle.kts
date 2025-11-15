@@ -1,16 +1,14 @@
-import com.android.build.gradle.ProguardFiles.getDefaultProguardFile
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
-    namespace = "syambabu.project.medicinereminder"
+    namespace = "tees.syambabu.medicinereminder"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "syambabu.project.medicinereminder"
+        applicationId = "tees.syambabu.medicinereminder"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

@@ -1,4 +1,4 @@
-package syambabu.project.medicinereminder
+package tees.syambabu.medicinereminder
 
 
 import android.content.Intent
@@ -34,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import syambabu.project.medicinereminder.ui.theme.MedicineReminderTheme
+import tees.syambabu.medicinereminder.ui.theme.MedicineReminderTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,12 +42,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MedicineReminderTheme {
-                OnBoardingScreen(::checkStudentStatus)
+                OnBoardingScreen(::checkUserStatus)
             }
         }
     }
 
-    private fun checkStudentStatus(studentStatus: Int) {
+    private fun checkUserStatus(studentStatus: Int) {
         if (studentStatus == 2) {
             startActivity(Intent(this, SessionActivity::class.java))
             finish()
@@ -63,7 +63,7 @@ fun OnBoardingScreen(onLoginClick: (studentStatus: Int) -> Unit) {
     SideEffect {
         CoroutineScope(Dispatchers.Main).launch {
             delay(3000)
-//            onLoginClick(if (StudentDetails.getStudentLoginDetails(context)) 1 else 2)
+            onLoginClick( 2)
         }
     }
 
