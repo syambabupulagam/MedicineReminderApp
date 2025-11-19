@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
     private fun checkUserStatus(studentStatus: Int) {
         if (studentStatus == 2) {
-            startActivity(Intent(this, SessionActivity::class.java))
+            startActivity(Intent(this, DashboardActivity::class.java))
             finish()
         }
 

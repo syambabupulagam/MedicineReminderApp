@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import kotlin.jvm.java
 
 
@@ -143,6 +144,7 @@ fun SessionActivityScreen() {
                         }
 
                         else -> {
+
 //                            val userEmail = email
 //                            val userPassword = password
 //
