@@ -64,7 +64,7 @@ fun SessionActivityScreen() {
     var errorMessage by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val context = LocalContext.current as Activity
+    val context = LocalContext.current.findActivity()
 
     Column(
         modifier = Modifier
@@ -139,60 +139,12 @@ fun SessionActivityScreen() {
                         }
 
                         password.isEmpty() -> {
-                            Toast.makeText(context, " Please Enter Password", Toast.LENGTH_SHORT)
-                                .show()
+                            Toast.makeText(context, " Please Enter Password", Toast.LENGTH_SHORT).show()
                         }
 
                         else -> {
-
-//                            val userEmail = email
-//                            val userPassword = password
-//
-//                            val database = FirebaseDatabase.getInstance()
-//                            val databaseReference = database.reference
-//
-//                            val sanitizedEmail = userEmail.replace(".", ",")
-//
-//                            databaseReference.child("Travellers").child(sanitizedEmail).get()
-//                                .addOnSuccessListener { snapshot ->
-//                                    if (snapshot.exists()) {
-//                                        val travelGuideData =
-//                                            snapshot.getValue(TravelGuideData::class.java)
-//                                        travelGuideData?.let {
-//                                            if (userPassword == it.password) {
-//                                                Toast.makeText(
-//                                                    context,
-//                                                    "Login Successfull",
-//                                                    Toast.LENGTH_SHORT
-//                                                ).show()
-//                                                TravelGuideDetails.saveTravelguideuserStatus(
-//                                                    context,
-//                                                    true
-//                                                )
-//                                                TravelGuideDetails.saveEmail(context, userEmail)
-//                                                context.startActivity(
-//                                                    Intent(
-//                                                        context,
-//                                                        HomeActivity::class.java
-//                                                    )
-//                                                )
-//                                                context.finish()
-//                                            } else {
-//                                                Toast.makeText(
-//                                                    context,
-//                                                    "Incorrect Credentials",
-//                                                    Toast.LENGTH_SHORT
-//                                                ).show()
-//                                            }
-//                                        }
-//                                    } else {
-//                                        Toast.makeText(context, "No User Found", Toast.LENGTH_SHORT)
-//                                            .show()
-//                                    }
-//                                }.addOnFailureListener { exception ->
-//                                    println("Error retrieving data: ${exception.message}")
-//                                }
-
+                            context!!.startActivity(Intent(context, DashboardActivity::class.java))
+                            context.finish()
                         }
 
                     }
@@ -223,7 +175,7 @@ fun SessionActivityScreen() {
                     fontWeight = FontWeight.Bold,
                     color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
                     modifier = Modifier.clickable {
-                        context.startActivity(Intent(context, UserSignupActivity::class.java))
+                        context!!.startActivity(Intent(context, UserSignupActivity::class.java))
                         context.finish()
                     }
                 )

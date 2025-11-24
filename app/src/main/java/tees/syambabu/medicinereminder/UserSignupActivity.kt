@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -59,7 +60,7 @@ fun SignUpScreen() {
     var password by remember { mutableStateOf("") }
 
 
-    val context = LocalContext.current as Activity
+    val context = LocalContext.current.findActivity()
 
 
     Column(
@@ -158,62 +159,22 @@ fun SignUpScreen() {
             Button(
                 onClick = {
                     when {
+                        name.isEmpty() -> {
+                            Toast.makeText(context, " Please Enter Name", Toast.LENGTH_SHORT).show()
+                        }
+                        age.isEmpty() -> {
+                            Toast.makeText(context, " Please Enter Age", Toast.LENGTH_SHORT).show()
+                        }
                         email.isEmpty() -> {
                             Toast.makeText(context, " Please Enter Mail", Toast.LENGTH_SHORT).show()
                         }
-
                         password.isEmpty() -> {
                             Toast.makeText(context, " Please Enter Password", Toast.LENGTH_SHORT)
                                 .show()
                         }
-
                         else -> {
-//                            errorMessage = ""
-//                            val travelGuideData = TravelGuideData(
-//                                fullname = fullname,
-//                                email = email,
-//                                country = country,
-//                                password = password
-//                            )
-//
-//                            val db = FirebaseDatabase.getInstance()
-//                            val ref = db.getReference("Travellers")
-//
-//                            ref.child(travelGuideData.email.replace(".", ","))
-//                                .setValue(travelGuideData)
-//                                .addOnCompleteListener { task ->
-//                                    if (task.isSuccessful) {
-//
-//                                        Toast.makeText(
-//                                            context,
-//                                            "Registration Successful",
-//                                            Toast.LENGTH_SHORT
-//                                        ).show()
-//                                        context.startActivity(
-//                                            Intent(
-//                                                context,
-//                                                SignInActivity::class.java
-//                                            )
-//                                        )
-//                                        context.finish()
-//                                    } else {
-//                                        Toast.makeText(
-//                                            context,
-//                                            "User Registration Failed: ${task.exception?.message}",
-//                                            Toast.LENGTH_SHORT
-//                                        ).show()
-//                                    }
-//                                }
-//                                .addOnFailureListener { exception ->
-//                                    Toast.makeText(
-//                                        context,
-//                                        "User Registration Failed: ${exception.message}",
-//                                        Toast.LENGTH_SHORT
-//                                    ).show()
-//                                }
+
                         }
-
-
                     }
                 },
                 modifier = Modifier
@@ -242,7 +203,7 @@ fun SignUpScreen() {
                     fontWeight = FontWeight.Bold,
                     color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
                     modifier = Modifier.clickable {
-                        context.startActivity(Intent(context, UserSignupActivity::class.java))
+                        context!!.startActivity(Intent(context, UserSignupActivity::class.java))
                         context.finish()
                     }
                 )
@@ -253,4 +214,11 @@ fun SignUpScreen() {
 
         }
     }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun SignUpScreenPreview() {
+    SignUpScreen()
 }

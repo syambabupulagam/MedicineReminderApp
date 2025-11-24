@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -49,6 +50,12 @@ class DashboardActivity : ComponentActivity() {
     }
 }
 
+
+@Preview(showBackground = true)
+@Composable
+fun DashboardScreenPreview() {
+    DashboardScreen()
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,9 +128,7 @@ fun DashboardScreen() {
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Re-added Medicine History card with navigation to the medicine list
-            // Medicine History card now navigates to the new global history list
-            DashboardCard(
+           DashboardCard(
                 title = "Medicine History",
                 description = "View past intake records for each medicine.",
                 icon = R.drawable.iv_medicine_history,
@@ -133,7 +138,6 @@ fun DashboardScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // New About Us Card
             DashboardCard(
                 title = "About Us",
                 description = "Learn more about the app and contact us.",
