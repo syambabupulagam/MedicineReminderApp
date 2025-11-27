@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,10 +35,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import tees.syambabu.medicinereminder.ui.theme.AddMedicineScreen
 import tees.syambabu.medicinereminder.ui.theme.MedicineReminderTheme
 
 class MainActivity : ComponentActivity() {
@@ -45,7 +52,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MedicineReminderTheme {
-                OnBoardingScreen(::checkUserStatus)
+//                OnBoardingScreen(::checkUserStatus)
             }
         }
     }
@@ -60,21 +67,82 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun OnBoardingScreen(onLoginClick: (studentStatus: Int) -> Unit) {
-    val context = LocalContext.current
+fun MedicineReminderApp() {
+    val navController = rememberNavController()
 
-    SideEffect {
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(3000)
-            onLoginClick( 2)
+    NavHost(navController = navController, startDestination = "splash") {
+
+        composable("splash") {
+            SplashScreen(navController = navController)
+        }
+
+        composable("login") {
+//            LoginScreen(navController = navController)
+        }
+        composable("register") {
+//            RegistrationScreen(navController = navController)
+        }
+        composable("dashboard") {
+//            DashboardScreen(navController = navController)
+        }
+        composable("add_medicine") {
+//            AddMedicineScreen(navController = navController, viewModel = viewModel)
+        }
+        composable("view_medicines") {
+//            MedicineListScreen(navController = navController, viewModel = viewModel)
+        }
+        composable("global_medicine_history_list") {
+//            GlobalMedicineHistoryListScreen(navController = navController, viewModel = viewModel)
+        }
+        composable("medicine_history/{medicineId}") { backStackEntry ->
+            val medicineId = backStackEntry.arguments?.getString("medicineId")?.toIntOrNull()
+            if (medicineId != null) {
+//                MedicineHistoryScreen(navController = navController, viewModel = viewModel, medicineId = medicineId)
+            } else {
+                Toast.makeText(LocalContext.current, "Medicine ID not found for history.", Toast.LENGTH_SHORT).show()
+                navController.popBackStack()
+            }
+        }
+
+        composable("profile_screen") {
+//            ProfileScreen(navController = navController)
+        }
+        composable("about_us_screen") {
+//            AboutUsScreen(navController = navController)
         }
     }
-
-    SplashScrOnBoardingScreenD()
 }
 
 @Composable
-fun SplashScrOnBoardingScreenD() {
+fun SplashScreen(navController: NavController) {
+
+    val context = LocalContext.current as Activity
+
+
+    LaunchedEffect(Unit) {
+        delay(3000)
+
+        val patientStatus = PatientData.getLoginStatus(context)
+        if (patientStatus) {
+            navController.navigate(NavigationScreens.Home.route) {
+                popUpTo(NavigationScreens.Splash.route) {
+                    inclusive = true
+                }
+            }
+        } else {
+            navController.navigate(NavigationScreens.Login.route) {
+                popUpTo(NavigationScreens.Splash.route) {
+                    inclusive = true
+                }
+            }
+        }
+    }
+
+    MedicineReminderSplashScreenDesign()
+}
+
+@Composable
+fun MedicineReminderSplashScreenDesign() {
     val context = LocalContext.current
     Box(
         modifier = Modifier
@@ -152,7 +220,7 @@ fun SplashScrOnBoardingScreenD() {
 @Preview(showBackground = true)
 @Composable
 fun SplashScrOnBoardingScreenDPreview() {
-    SplashScrOnBoardingScreenD()
+    MedicineReminderSplashScreenDesign()
 }
 
 fun Context.findActivity(): Activity? = when (this) {
