@@ -1,6 +1,5 @@
-package tees.syambabu.medicinereminder
+package s3494133.syambabu.medicinereminder
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,12 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import tees.syambabu.medicinereminder.ui.theme.Blue
-import tees.syambabu.medicinereminder.ui.theme.LightLavender
-import tees.syambabu.medicinereminder.ui.theme.LightPink
-import tees.syambabu.medicinereminder.ui.theme.Orange
-import tees.syambabu.medicinereminder.ui.theme.Pink
-import tees.syambabu.medicinereminder.ui.theme.PurpleDeep
+import s3494133.syambabu.medicinereminder.ui.theme.Blue
+import s3494133.syambabu.medicinereminder.ui.theme.LightLavender
+import s3494133.syambabu.medicinereminder.ui.theme.LightPink
+import s3494133.syambabu.medicinereminder.ui.theme.Orange
+import s3494133.syambabu.medicinereminder.ui.theme.PurpleDeep
+import s3494133.syambabu.medicinereminder.utils.UserPrefs
 
 
 @Preview(showBackground = true)
@@ -55,6 +54,10 @@ fun DashboardScreenPreview() {
 fun DashboardScreen(navController: NavController) {
 
     val context = LocalContext.current
+
+
+    val userName = UserPrefs.getName(context)
+
 
     Scaffold(
         topBar = {
@@ -91,7 +94,7 @@ fun DashboardScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Hi , User",
+                text = "Hi , $userName",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
@@ -112,7 +115,7 @@ fun DashboardScreen(navController: NavController) {
                 onClick = {
                     navController.navigate("add_medicine")
                 },
-                PurpleDeep
+                Blue
             )
             Spacer(modifier = Modifier.height(16.dp))
 

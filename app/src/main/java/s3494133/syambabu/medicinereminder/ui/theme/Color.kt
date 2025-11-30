@@ -1,4 +1,4 @@
-package tees.syambabu.medicinereminder.ui.theme
+package s3494133.syambabu.medicinereminder.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -11,8 +11,8 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val PurpleDeep = Color(0xFF4A3DA8)
-val Orange = Color(0xFFFFA726)
-val OrangeDeep = Color(0xFFFF7043)
+val Orange = Color(0xFF31473A)
+val OrangeDeep = Color(0xFF31473A)
 val Pink = Color(0xFFFF94C2)
 val Blue = Color(0xFF42A5F5)
 val LightPurple = Color(0xFFE3E3FA)

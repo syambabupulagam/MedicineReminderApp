@@ -1,5 +1,4 @@
-package tees.syambabu.medicinereminder
-
+package s3494133.syambabu.medicinereminder
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -38,21 +37,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import tees.syambabu.medicinereminder.ui.theme.OrangeDeep
+import com.google.firebase.database.FirebaseDatabase
+import s3494133.syambabu.medicinereminder.ui.theme.OrangeDeep
 
 
 @Composable
-fun SessionActivityScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController) {
+    var name by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
+
     var email by remember { mutableStateOf("") }
+    var phonenumber by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
 
     val context = LocalContext.current.findActivity()
 
     Scaffold(
         topBar = {},
         content = { innerPadding ->
-
 
             Column(
                 modifier = Modifier
@@ -79,6 +83,34 @@ fun SessionActivityScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Enter Your Name") }
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        value = age,
+                        onValueChange = { age = it },
+                        label = { Text("Enter Your Age") }
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+
 
                     TextField(
                         modifier = Modifier
@@ -90,6 +122,20 @@ fun SessionActivityScreen(navController: NavController) {
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Enter Your Email") }
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        value = phonenumber,
+                        onValueChange = { phonenumber = it },
+                        label = { Text("Enter Your Phone Number") }
                     )
 
                     Spacer(modifier = Modifier.height(6.dp)) // Space between fields
@@ -121,6 +167,19 @@ fun SessionActivityScreen(navController: NavController) {
                     Button(
                         onClick = {
                             when {
+                                name.isEmpty() -> {
+                                    Toast.makeText(
+                                        context,
+                                        " Please Enter Name",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                age.isEmpty() -> {
+                                    Toast.makeText(context, " Please Enter Age", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+
                                 email.isEmpty() -> {
                                     Toast.makeText(
                                         context,
@@ -129,24 +188,70 @@ fun SessionActivityScreen(navController: NavController) {
                                     ).show()
                                 }
 
+                                phonenumber.isEmpty() -> {
+                                    Toast.makeText(
+                                        context,
+                                        " Please Enter Phone Number",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
+
                                 password.isEmpty() -> {
                                     Toast.makeText(
                                         context,
                                         " Please Enter Password",
                                         Toast.LENGTH_SHORT
-                                    ).show()
+                                    )
+                                        .show()
                                 }
 
                                 else -> {
 
-                                    navController.navigate(NavigationScreens.Home.route) {
-                                        popUpTo(NavigationScreens.Splash.route) {
-                                            inclusive = true
+                                    val userData = PatientData(
+                                        name = name,
+                                        email = email,
+                                        age = age,
+                                        phone = phonenumber,
+                                        password = password
+                                    )
+
+
+                                    val db = FirebaseDatabase.getInstance()
+                                    val ref = db.getReference("PatientAccounts")
+                                    ref.child(userData.email.replace(".", ",")).setValue(userData)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+
+                                                Toast.makeText(
+                                                    context,
+                                                    "Registration Successful",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+
+                                                navController.navigate(NavigationScreens.Login.route) {
+                                                    popUpTo(NavigationScreens.Register.route) {
+                                                        inclusive = true
+                                                    }
+                                                }
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "User Registration Failed: ${task.exception?.message}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
                                         }
-                                    }
+                                        .addOnFailureListener { exception ->
+                                            Toast.makeText(
+                                                context,
+                                                "User Registration Failed: ${exception.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
 
                                 }
-
                             }
                         },
                         modifier = Modifier
@@ -159,25 +264,25 @@ fun SessionActivityScreen(navController: NavController) {
                             )
                         )
                     ) {
-                        Text(text = "Sign In", fontSize = 16.sp)
+                        Text(text = "Sign Up", fontSize = 16.sp)
                     }
-                    Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
+                    Spacer(modifier = Modifier.weight(1f))
 
                     // Sign Up text section
                     Row(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
-                        Text(text = "You are a new user ?", fontSize = 14.sp)
+                        Text(text = "You are a old user ?", fontSize = 14.sp)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Sign Up",
+                            text = "Sign In",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
                             modifier = Modifier.clickable {
 
-                                navController.navigate(NavigationScreens.Register.route) {
-                                    popUpTo(NavigationScreens.Login.route) {
+                                navController.navigate(NavigationScreens.Login.route) {
+                                    popUpTo(NavigationScreens.Register.route) {
                                         inclusive = true
                                     }
                                 }
@@ -191,14 +296,22 @@ fun SessionActivityScreen(navController: NavController) {
 
                 }
             }
-
         }
     )
 }
 
+data class PatientData
+    (
+    var name: String = "",
+    var age: String = "",
+    var email: String = "",
+    var phone: String = "",
+    var password: String = "",
+)
+
 
 @Preview(showBackground = true)
 @Composable
-fun SessionActivityScreenPreview() {
-    SessionActivityScreen(navController = NavHostController(LocalContext.current))
+fun SignUpScreenPreview() {
+    SignUpScreen(navController = NavHostController(LocalContext.current))
 }

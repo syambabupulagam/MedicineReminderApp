@@ -1,4 +1,4 @@
-package tees.syambabu.medicinereminder.ui.theme
+package s3494133.syambabu.medicinereminder.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

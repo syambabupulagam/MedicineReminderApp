@@ -1,5 +1,7 @@
-package tees.syambabu.medicinereminder
+package s3494133.syambabu.medicinereminder
 
+
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,24 +39,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import tees.syambabu.medicinereminder.ui.theme.OrangeDeep
+import com.google.firebase.database.FirebaseDatabase
+import s3494133.syambabu.medicinereminder.ui.theme.OrangeDeep
+import s3494133.syambabu.medicinereminder.utils.UserPrefs
 
 
 @Composable
-fun SignUpScreen(navController: NavController) {
-    var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-
+fun SessionActivityScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-
     val context = LocalContext.current.findActivity()
+
+    val context1 = LocalContext.current
 
     Scaffold(
         topBar = {},
         content = { innerPadding ->
+
 
             Column(
                 modifier = Modifier
@@ -81,34 +84,6 @@ fun SignUpScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
-                                shape = RoundedCornerShape(16.dp)
-                            ),
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Enter Your Name") }
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
-
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
-                                shape = RoundedCornerShape(16.dp)
-                            ),
-                        value = age,
-                        onValueChange = { age = it },
-                        label = { Text("Enter Your Age") }
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
-
 
                     TextField(
                         modifier = Modifier
@@ -119,7 +94,7 @@ fun SignUpScreen(navController: NavController) {
                             ),
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Enter Your Email") }
+                        label = { Text("Enter Your Email/PhoneNumber") }
                     )
 
                     Spacer(modifier = Modifier.height(6.dp)) // Space between fields
@@ -151,23 +126,10 @@ fun SignUpScreen(navController: NavController) {
                     Button(
                         onClick = {
                             when {
-                                name.isEmpty() -> {
-                                    Toast.makeText(
-                                        context,
-                                        " Please Enter Name",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-
-                                age.isEmpty() -> {
-                                    Toast.makeText(context, " Please Enter Age", Toast.LENGTH_SHORT)
-                                        .show()
-                                }
-
                                 email.isEmpty() -> {
                                     Toast.makeText(
                                         context,
-                                        " Please Enter Mail",
+                                        " Please Enter Mail/Phone Number",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -177,18 +139,16 @@ fun SignUpScreen(navController: NavController) {
                                         context,
                                         " Please Enter Password",
                                         Toast.LENGTH_SHORT
-                                    )
-                                        .show()
+                                    ).show()
                                 }
 
                                 else -> {
 
-                                    navController.navigate(NavigationScreens.Login.route) {
-                                        popUpTo(NavigationScreens.Register.route) {
-                                            inclusive = true
-                                        }
-                                    }
+                                    loginUser(email, password, context1, navController)
+
+
                                 }
+
                             }
                         },
                         modifier = Modifier
@@ -201,7 +161,7 @@ fun SignUpScreen(navController: NavController) {
                             )
                         )
                     ) {
-                        Text(text = "Sign Up", fontSize = 16.sp)
+                        Text(text = "Sign In", fontSize = 16.sp)
                     }
                     Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
 
@@ -209,17 +169,17 @@ fun SignUpScreen(navController: NavController) {
                     Row(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
-                        Text(text = "You are a old user ?", fontSize = 14.sp)
+                        Text(text = "You are a new user ?", fontSize = 14.sp)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Sign In",
+                            text = "Sign Up",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
                             modifier = Modifier.clickable {
 
-                                navController.navigate(NavigationScreens.Login.route) {
-                                    popUpTo(NavigationScreens.Register.route) {
+                                navController.navigate(NavigationScreens.Register.route) {
+                                    popUpTo(NavigationScreens.Login.route) {
                                         inclusive = true
                                     }
                                 }
@@ -233,13 +193,92 @@ fun SignUpScreen(navController: NavController) {
 
                 }
             }
+
         }
     )
 }
 
+fun loginUser(loginInput: String, password: String, context: Context, navController: NavController) {
+
+    val db = FirebaseDatabase.getInstance().getReference("PatientAccounts")
+
+    // First: try login as Email
+    if (loginInput.contains("@")) {
+
+        val emailKey = loginInput.replace(".", ",")
+
+        db.child(emailKey).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val savedPassword = snapshot.child("password").value.toString()
+
+                if (savedPassword == password) {
+                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+
+                    UserPrefs.markLoginStatus(context, true)
+                    UserPrefs.saveEmail(
+                        context,
+                        email = loginInput
+                    )
+                    UserPrefs.saveName(context, snapshot.child("name").value.toString())
+
+
+
+                    navController.navigate(NavigationScreens.Home.route) {
+                        popUpTo(NavigationScreens.Login.route) { inclusive = true }
+                    }
+
+                } else {
+                    Toast.makeText(context, "Incorrect Password", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(context, "No account with this email", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    } else {
+        // Second: login using Phone number
+        db.get().addOnSuccessListener { snapshot ->
+            var found = false
+
+            for (child in snapshot.children) {
+                val savedPhone = child.child("phone").value.toString()
+                val savedPassword = child.child("password").value.toString()
+
+                if (savedPhone == loginInput) {
+                    found = true
+                    if (savedPassword == password) {
+
+                        UserPrefs.markLoginStatus(context, true)
+                        UserPrefs.saveEmail(
+                            context,
+                            email = child.child("email").value.toString()
+                        )
+                        UserPrefs.saveName(context, child.child("name").value.toString())
+
+                        Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+
+                        navController.navigate(NavigationScreens.Home.route) {
+                            popUpTo(NavigationScreens.Login.route) { inclusive = true }
+                        }
+
+                    } else {
+                        Toast.makeText(context, "Incorrect Password", Toast.LENGTH_SHORT).show()
+                    }
+                    break
+                }
+            }
+
+            if (!found) {
+                Toast.makeText(context, "No account with this phone number", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+
+
 
 @Preview(showBackground = true)
 @Composable
-fun SignUpScreenPreview() {
-    SignUpScreen(navController = NavHostController(LocalContext.current))
+fun SessionActivityScreenPreview() {
+    SessionActivityScreen(navController = NavHostController(LocalContext.current))
 }

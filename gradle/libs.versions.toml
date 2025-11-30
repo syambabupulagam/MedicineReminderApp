@@ -13,6 +13,7 @@ material = "1.10.0"
 activity = "1.11.0"
 navigationRuntimeKtx = "2.9.6"
 coreKtxVersion = "1.7.0"
+firebaseDatabaseKtx = "21.0.0"
 
 
 [libraries]
@@ -35,6 +36,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
+firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

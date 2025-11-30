@@ -1,4 +1,4 @@
-package tees.syambabu.medicinereminder.utils
+package s3494133.syambabu.medicinereminder.utils
 
 import android.app.Application
 import android.util.Log

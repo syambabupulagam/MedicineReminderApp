@@ -1,4 +1,4 @@
-package tees.syambabu.medicinereminder
+package s3494133.syambabu.medicinereminder
 
 sealed class NavigationScreens(val route: String) {
     object Splash : NavigationScreens("splash_route")

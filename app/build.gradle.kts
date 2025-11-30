@@ -2,14 +2,16 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
+    id("com.google.gms.google-services")
+
 }
 
 android {
-    namespace = "tees.syambabu.medicinereminder"
+    namespace = "s3494133.syambabu.medicinereminder"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "tees.syambabu.medicinereminder"
+        applicationId = "s3494133.syambabu.medicinereminder"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -65,6 +67,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.core.ktx)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

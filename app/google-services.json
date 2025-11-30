@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "388544870340",
+    "project_id": "medicinereminder-dd08c",
+    "storage_bucket": "medicinereminder-dd08c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:388544870340:android:5409568a2b6eb42c961691",
+        "android_client_info": {
+          "package_name": "s3494133.syambabu.medicinereminder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArbCkBZBWbPgaQWmB2lXcorAEgQsSuyZI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

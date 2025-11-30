@@ -1,4 +1,4 @@
-package tees.syambabu.medicinereminder.ui.theme
+package s3494133.syambabu.medicinereminder.ui.theme
 
 
 import android.Manifest
@@ -66,10 +66,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
-import tees.syambabu.medicinereminder.R
-import tees.syambabu.medicinereminder.utils.Medicine
-import tees.syambabu.medicinereminder.utils.MedicineViewModel
-import tees.syambabu.medicinereminder.utils.NotificationScheduler
+import s3494133.syambabu.medicinereminder.R
+import s3494133.syambabu.medicinereminder.utils.Medicine
+import s3494133.syambabu.medicinereminder.utils.MedicineViewModel
+import s3494133.syambabu.medicinereminder.utils.NotificationScheduler
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
