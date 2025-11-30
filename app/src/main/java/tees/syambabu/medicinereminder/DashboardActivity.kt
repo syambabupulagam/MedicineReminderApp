@@ -1,14 +1,10 @@
 package tees.syambabu.medicinereminder
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,34 +28,31 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
-
-class DashboardActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            DashboardScreen()
-        }
-    }
-}
+import androidx.navigation.NavHostController
+import tees.syambabu.medicinereminder.ui.theme.Blue
+import tees.syambabu.medicinereminder.ui.theme.LightLavender
+import tees.syambabu.medicinereminder.ui.theme.LightPink
+import tees.syambabu.medicinereminder.ui.theme.Orange
+import tees.syambabu.medicinereminder.ui.theme.Pink
+import tees.syambabu.medicinereminder.ui.theme.PurpleDeep
 
 
 @Preview(showBackground = true)
 @Composable
 fun DashboardScreenPreview() {
-    DashboardScreen()
+    DashboardScreen(navController = NavHostController(LocalContext.current))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(navController: NavController) {
 
     val context = LocalContext.current
 
@@ -74,11 +67,11 @@ fun DashboardScreen() {
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Orange,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = { // Add actions block for trailing icons
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Profile",
@@ -116,7 +109,10 @@ fun DashboardScreen() {
                 title = "Add New Medicine",
                 description = "Set name, dosage, time, and frequency.",
                 icon = R.drawable.iv_add_medicine,
-                onClick = {  }
+                onClick = {
+                    navController.navigate("add_medicine")
+                },
+                PurpleDeep
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -124,16 +120,18 @@ fun DashboardScreen() {
                 title = "Scheduled Medicines",
                 description = "See all your upcoming medicine schedules.",
                 icon = R.drawable.iv_schedule_medicine,
-                onClick = {  }
+                onClick = { },
+                LightPink
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-           DashboardCard(
+            DashboardCard(
                 title = "Medicine History",
                 description = "View past intake records for each medicine.",
                 icon = R.drawable.iv_medicine_history,
                 onClick = {
-                }
+                },
+                Blue
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -143,7 +141,8 @@ fun DashboardScreen() {
                 description = "Learn more about the app and contact us.",
                 icon = R.drawable.iv_aboutus, // Using Info icon
                 onClick = {
-                }
+                },
+                LightLavender
             )
         }
     }
@@ -154,7 +153,8 @@ fun DashboardCard(
     title: String,
     description: String,
     icon: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    cardColor: Color
 ) {
     Card(
         modifier = Modifier
@@ -163,7 +163,8 @@ fun DashboardCard(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor =
+            cardColor)
     ) {
         Row(
             modifier = Modifier
@@ -174,7 +175,7 @@ fun DashboardCard(
 
 
             Icon(
-                painter = painterResource(id =icon), // Pass your drawable resource here
+                painter = painterResource(id = icon), // Pass your drawable resource here
                 contentDescription = null, // Provide a meaningful description if it's not purely decorative
                 modifier = Modifier.size(48.dp)
             )

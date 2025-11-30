@@ -2,6 +2,7 @@ package tees.syambabu.medicinereminder
 
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,6 +47,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import tees.syambabu.medicinereminder.ui.theme.AddMedicineScreen
 import tees.syambabu.medicinereminder.ui.theme.MedicineReminderTheme
+import tees.syambabu.medicinereminder.ui.theme.OrangeDeep
+import tees.syambabu.medicinereminder.utils.MedicineViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,64 +56,45 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MedicineReminderTheme {
-//                OnBoardingScreen(::checkUserStatus)
+                MedicineReminderApp()
             }
         }
     }
 
-    private fun checkUserStatus(studentStatus: Int) {
-        if (studentStatus == 2) {
-            startActivity(Intent(this, DashboardActivity::class.java))
-            finish()
-        }
-
-    }
 }
 
 @Composable
 fun MedicineReminderApp() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "splash") {
+    val context = LocalContext.current
+    val viewModel: MedicineViewModel = viewModel(
+        factory = MedicineViewModel.MedicineViewModelFactory(context.applicationContext as Application)
+    )
 
-        composable("splash") {
+    NavHost(navController = navController, startDestination = NavigationScreens.Splash.route) {
+
+        composable(NavigationScreens.Splash.route) {
             SplashScreen(navController = navController)
         }
 
-        composable("login") {
-//            LoginScreen(navController = navController)
+        composable(NavigationScreens.Login.route) {
+            SessionActivityScreen(navController = navController)
         }
-        composable("register") {
-//            RegistrationScreen(navController = navController)
+        composable(NavigationScreens.Register.route) {
+            SignUpScreen(navController = navController)
         }
-        composable("dashboard") {
-//            DashboardScreen(navController = navController)
+        composable(NavigationScreens.Home.route) {
+            DashboardScreen(navController = navController)
         }
-        composable("add_medicine") {
-//            AddMedicineScreen(navController = navController, viewModel = viewModel)
+        composable(NavigationScreens.AddMedicine.route) {
+            AddMedicineScreen(navController = navController, viewModel = viewModel)
         }
         composable("view_medicines") {
 //            MedicineListScreen(navController = navController, viewModel = viewModel)
         }
-        composable("global_medicine_history_list") {
-//            GlobalMedicineHistoryListScreen(navController = navController, viewModel = viewModel)
-        }
-        composable("medicine_history/{medicineId}") { backStackEntry ->
-            val medicineId = backStackEntry.arguments?.getString("medicineId")?.toIntOrNull()
-            if (medicineId != null) {
-//                MedicineHistoryScreen(navController = navController, viewModel = viewModel, medicineId = medicineId)
-            } else {
-                Toast.makeText(LocalContext.current, "Medicine ID not found for history.", Toast.LENGTH_SHORT).show()
-                navController.popBackStack()
-            }
-        }
 
-        composable("profile_screen") {
-//            ProfileScreen(navController = navController)
-        }
-        composable("about_us_screen") {
-//            AboutUsScreen(navController = navController)
-        }
+
     }
 }
 
@@ -147,7 +132,7 @@ fun MedicineReminderSplashScreenDesign() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.evergreen)),
+            .background(OrangeDeep),
         contentAlignment = Alignment.Center
     ) {
         Column(

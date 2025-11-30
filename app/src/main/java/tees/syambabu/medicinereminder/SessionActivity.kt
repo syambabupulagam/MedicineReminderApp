@@ -1,12 +1,7 @@
 package tees.syambabu.medicinereminder
 
 
-import android.app.Activity
-import android.content.Intent
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,11 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,154 +36,169 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
-import kotlin.jvm.java
-
-
-class SessionActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            SessionActivityScreen()
-        }
-    }
-}
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import tees.syambabu.medicinereminder.ui.theme.OrangeDeep
 
 
 @Composable
-fun SessionActivityScreen() {
+fun SessionActivityScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val context = LocalContext.current.findActivity()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = colorResource(id = R.color.SkyBlue))// Background color for the entire screen // Background color for the entire screen
-    ) {
-        // Top section with an image and blue background
-
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            painter = painterResource(id = R.drawable.ic_medicine_reminder),
-            contentDescription = "Medicine Reminder",
-        )
+    Scaffold(
+        topBar = {},
+        content = { innerPadding ->
 
 
-        // Bottom section with email, password fields, and sign-in button on a white background
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .background(color = colorResource(id = R.color.SkyBlue))// Background color for the entire screen
-                .padding(16.dp), // Padding for the fields
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-
-            TextField(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
-                        shape = RoundedCornerShape(16.dp)
-                    ),
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Enter Your Email") }
-            )
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .background(OrangeDeep)
+            ) {
 
-            Spacer(modifier = Modifier.height(6.dp)) // Space between fields
-
-            // Password Text Field
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
-                        shape = RoundedCornerShape(16.dp)
-                    ),
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Enter Your Password") }
-            )
-
-            Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
-
-            if (errorMessage.isNotEmpty()) {
-                Text(
-                    text = errorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    painter = painterResource(id = R.drawable.ic_medicine_reminder),
+                    contentDescription = "Medicine Reminder",
                 )
 
-            }
-            // Sign In Button
-            Button(
-                onClick = {
-                    when {
-                        email.isEmpty() -> {
-                            Toast.makeText(context, " Please Enter Mail", Toast.LENGTH_SHORT).show()
-                        }
 
-                        password.isEmpty() -> {
-                            Toast.makeText(context, " Please Enter Password", Toast.LENGTH_SHORT).show()
-                        }
+                // Bottom section with email, password fields, and sign-in button on a white background
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(16.dp), // Padding for the fields
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-                        else -> {
-                            context!!.startActivity(Intent(context, DashboardActivity::class.java))
-                            context.finish()
-                        }
 
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.PureWhite),
-                    contentColor = colorResource(
-                        id = R.color.SkyBlue
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Enter Your Email") }
                     )
-                )
-            ) {
-                Text(text = "Sign In", fontSize = 16.sp)
-            }
-            Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
 
-            // Sign Up text section
-            Row(
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text(text = "You are a user ?", fontSize = 14.sp)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "Sign Up",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
-                    modifier = Modifier.clickable {
-                        context!!.startActivity(Intent(context, UserSignupActivity::class.java))
-                        context.finish()
+                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+
+                    // Password Text Field
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Enter Your Password") }
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+
+                    if (errorMessage.isNotEmpty()) {
+                        Text(
+                            text = errorMessage,
+                            color = Color.Red,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
                     }
-                )
+                    // Sign In Button
+                    Button(
+                        onClick = {
+                            when {
+                                email.isEmpty() -> {
+                                    Toast.makeText(
+                                        context,
+                                        " Please Enter Mail",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                password.isEmpty() -> {
+                                    Toast.makeText(
+                                        context,
+                                        " Please Enter Password",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                else -> {
+
+                                    navController.navigate(NavigationScreens.Home.route) {
+                                        popUpTo(NavigationScreens.Splash.route) {
+                                            inclusive = true
+                                        }
+                                    }
+
+                                }
+
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorResource(id = R.color.PureWhite),
+                            contentColor = colorResource(
+                                id = R.color.SkyBlue
+                            )
+                        )
+                    ) {
+                        Text(text = "Sign In", fontSize = 16.sp)
+                    }
+                    Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
+
+                    // Sign Up text section
+                    Row(
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(text = "You are a new user ?", fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Sign Up",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
+                            modifier = Modifier.clickable {
+
+                                navController.navigate(NavigationScreens.Register.route) {
+                                    popUpTo(NavigationScreens.Login.route) {
+                                        inclusive = true
+                                    }
+                                }
+
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+
+
+                }
             }
-
-            Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
-
 
         }
-    }
+    )
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun SessionActivityScreenPreview() {
-    SessionActivityScreen()
+    SessionActivityScreen(navController = NavHostController(LocalContext.current))
 }
