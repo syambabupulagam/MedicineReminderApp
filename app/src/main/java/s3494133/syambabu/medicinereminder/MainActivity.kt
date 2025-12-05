@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -39,16 +40,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
-import s3494133.syambabu.medicinereminder.ui.theme.AddMedicineScreen
+import s3494133.syambabu.medicinereminder.homenavigations.AddMedicineScreen
 import s3494133.syambabu.medicinereminder.ui.theme.MedicineReminderTheme
 import s3494133.syambabu.medicinereminder.ui.theme.OrangeDeep
-import s3494133.syambabu.medicinereminder.utils.MedicineViewModel
+import s3494133.syambabu.medicinereminder.data.MedicineViewModel
+import s3494133.syambabu.medicinereminder.homenavigations.GlobalMedicineHistoryListScreen
+import s3494133.syambabu.medicinereminder.homenavigations.MedicineListScreen
+import s3494133.syambabu.medicinereminder.ui.theme.DarkGreen
+import s3494133.syambabu.medicinereminder.utils.NavigationScreens
+import s3494133.syambabu.medicinereminder.utils.NotificationScheduler
 import s3494133.syambabu.medicinereminder.utils.UserPrefs
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        NotificationScheduler.createNotificationChannels(this)
+
         setContent {
             MedicineReminderTheme {
                 MedicineReminderApp()
@@ -85,8 +92,12 @@ fun MedicineReminderApp() {
         composable(NavigationScreens.AddMedicine.route) {
             AddMedicineScreen(navController = navController, viewModel = viewModel)
         }
-        composable("view_medicines") {
-//            MedicineListScreen(navController = navController, viewModel = viewModel)
+
+        composable(NavigationScreens.ViewMedicine.route) {
+            MedicineListScreen(navController = navController, viewModel = viewModel)
+        }
+        composable(NavigationScreens.GlobalMedicineHistoryList.route) {
+            GlobalMedicineHistoryListScreen(navController = navController, viewModel = viewModel)
         }
 
 
@@ -123,11 +134,10 @@ fun SplashScreen(navController: NavController) {
 
 @Composable
 fun MedicineReminderSplashScreenDesign() {
-    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(OrangeDeep),
+            .background(DarkGreen),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -178,7 +188,7 @@ fun MedicineReminderSplashScreenDesign() {
                     Text(
                         text = "Syam Babu",
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(id = R.color.evergreen), // Green color similar to the design
+                        color = DarkGreen, // Green color similar to the design
                         fontSize = 26.sp,
                         style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
                         modifier = Modifier.align(Alignment.CenterHorizontally)

@@ -19,3 +19,6 @@ val LightPurple = Color(0xFFE3E3FA)
 val LightPeach = Color(0xFFFFEBE5)
 val LightPink = Color(0xFFFDDDF1)
 val LightLavender = Color(0xFFEDEBFA)
+
+val DarkGreen = Color(0xFF31473A)
+val LiteGreen = Color(0xFFcad2c5)

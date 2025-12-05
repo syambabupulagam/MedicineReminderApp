@@ -16,8 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -30,17 +35,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.google.firebase.database.FirebaseDatabase
-import s3494133.syambabu.medicinereminder.ui.theme.OrangeDeep
+import s3494133.syambabu.medicinereminder.ui.theme.DarkGreen
+import s3494133.syambabu.medicinereminder.utils.CryptoUtils
+import s3494133.syambabu.medicinereminder.utils.NavigationScreens
 import s3494133.syambabu.medicinereminder.utils.UserPrefs
 
 
@@ -49,6 +58,7 @@ fun SessionActivityScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current.findActivity()
 
@@ -63,7 +73,7 @@ fun SessionActivityScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .background(OrangeDeep)
+                    .background(DarkGreen)
             ) {
 
                 Image(
@@ -109,7 +119,19 @@ fun SessionActivityScreen(navController: NavController) {
                             ),
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Enter Your Password") }
+                        label = { Text("Enter Your Password") },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val image = if (passwordVisible)
+                                Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
+
+                            val description = if (passwordVisible) "Hide password" else "Show password"
+
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = image, description)
+                            }
+                        }
                     )
 
                     Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
@@ -155,10 +177,8 @@ fun SessionActivityScreen(navController: NavController) {
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id = R.color.PureWhite),
-                            contentColor = colorResource(
-                                id = R.color.SkyBlue
-                            )
+                            containerColor = Color.White,
+                            contentColor = DarkGreen
                         )
                     ) {
                         Text(text = "Sign In", fontSize = 16.sp)
@@ -175,7 +195,7 @@ fun SessionActivityScreen(navController: NavController) {
                             text = "Sign Up",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
+                            color = Color.White, // Blue text color for "Sign Up"
                             modifier = Modifier.clickable {
 
                                 navController.navigate(NavigationScreens.Register.route) {
@@ -210,8 +230,9 @@ fun loginUser(loginInput: String, password: String, context: Context, navControl
         db.child(emailKey).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
                 val savedPassword = snapshot.child("password").value.toString()
+                val decryptedPassword = CryptoUtils.decrypt(savedPassword)
 
-                if (savedPassword == password) {
+                if (decryptedPassword == password) {
                     Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
 
                     UserPrefs.markLoginStatus(context, true)
@@ -243,10 +264,11 @@ fun loginUser(loginInput: String, password: String, context: Context, navControl
             for (child in snapshot.children) {
                 val savedPhone = child.child("phone").value.toString()
                 val savedPassword = child.child("password").value.toString()
+                val decryptedPassword = CryptoUtils.decrypt(savedPassword)
 
                 if (savedPhone == loginInput) {
                     found = true
-                    if (savedPassword == password) {
+                    if (decryptedPassword == password) {
 
                         UserPrefs.markLoginStatus(context, true)
                         UserPrefs.saveEmail(

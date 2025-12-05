@@ -1,4 +1,4 @@
-package s3494133.syambabu.medicinereminder.utils
+package s3494133.syambabu.medicinereminder.data
 
 
 import android.content.Context

@@ -1,4 +1,4 @@
-package s3494133.syambabu.medicinereminder.utils
+package s3494133.syambabu.medicinereminder.data
 
 import android.app.Application
 import android.util.Log
@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import s3494133.syambabu.medicinereminder.data.MedicineRepository
 import kotlin.math.max
 
 open class MedicineViewModel(application: Application) : AndroidViewModel(application) {
@@ -23,7 +24,8 @@ open class MedicineViewModel(application: Application) : AndroidViewModel(applic
         viewModelScope.launch {
             try {
                 val database = AppDatabase.getDatabase(application)
-                repository = MedicineRepository(database.medicineDao(), database.medicineHistoryDao())
+                repository =
+                    MedicineRepository(database.medicineDao(), database.medicineHistoryDao())
                 repository.allMedicines.collect { medicines ->
                     (allMedicines as MutableStateFlow).value = medicines
                 }
@@ -64,7 +66,13 @@ open class MedicineViewModel(application: Application) : AndroidViewModel(applic
 
     fun markMedicineTaken(medicineId: Int, dosage: String) = viewModelScope.launch {
         ensureRepositoryInitialized()
-        repository.insertMedicineHistory(MedicineHistory(medicineId = medicineId, takenTimestamp = System.currentTimeMillis(), dosageTaken = dosage))
+        repository.insertMedicineHistory(
+            MedicineHistory(
+                medicineId = medicineId,
+                takenTimestamp = System.currentTimeMillis(),
+                dosageTaken = dosage
+            )
+        )
         val medicine = repository.getMedicineById(medicineId).first()
         medicine?.let {
             val newQuantity = (it.currentQuantity ?: 0) - 1

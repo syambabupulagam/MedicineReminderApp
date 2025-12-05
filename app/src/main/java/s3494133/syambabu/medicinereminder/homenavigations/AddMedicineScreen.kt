@@ -1,4 +1,4 @@
-package s3494133.syambabu.medicinereminder.ui.theme
+package s3494133.syambabu.medicinereminder.homenavigations
 
 
 import android.Manifest
@@ -34,6 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -53,6 +54,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -61,21 +64,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import s3494133.syambabu.medicinereminder.R
-import s3494133.syambabu.medicinereminder.utils.Medicine
-import s3494133.syambabu.medicinereminder.utils.MedicineViewModel
+import s3494133.syambabu.medicinereminder.data.Medicine
+import s3494133.syambabu.medicinereminder.data.MedicineViewModel
+import s3494133.syambabu.medicinereminder.ui.theme.DarkGreen
 import s3494133.syambabu.medicinereminder.utils.NotificationScheduler
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -98,15 +97,12 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
     val showTimePicker = remember { mutableStateOf(false) }
     val timePickerIndex = remember { mutableStateOf(0) }
 
-    val tempPhotoUri = remember { mutableStateOf<Uri?>(null) }
-
-    val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success: Boolean ->
-        if (success) {
-            photoUri = tempPhotoUri.value
-        } else {
-            Toast.makeText(context, "Photo capture failed", Toast.LENGTH_SHORT).show()
+    val takePicturePreview = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            val file = saveBitmapToCache(context, bitmap)
+            photoUri = Uri.fromFile(file)
         }
     }
 
@@ -114,11 +110,7 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            val file = createImageFile(context)
-            val uri =
-                FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-            tempPhotoUri.value = uri
-            takePictureLauncher.launch(uri)
+            takePicturePreview.launch()
         } else {
             Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
         }
@@ -128,7 +120,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // Re-attempt save and schedule after permission is granted
             Toast.makeText(context, "Notification permission granted!", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(
@@ -144,12 +135,10 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
     ) {
         if (NotificationScheduler.canScheduleExactAlarms(context)) {
             Toast.makeText(context, "Alarms & reminders permission granted!", Toast.LENGTH_SHORT).show()
-
         } else {
             Toast.makeText(context, "Alarms & reminders permission denied. Exact reminders may not work.", Toast.LENGTH_LONG).show()
         }
     }
-
 
     Scaffold(
         topBar = {
@@ -158,20 +147,20 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     Text(
                         "Add New Medicine",
                         style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.surface
+                            tint = Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Orange,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = DarkGreen
                 )
             )
         }
@@ -184,7 +173,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
             item {
                 OutlinedTextField(
                     value = name,
@@ -194,7 +182,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-
             item {
                 OutlinedTextField(
                     value = dosage,
@@ -204,8 +191,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-
-            // Multiple Doses per Day
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -253,13 +238,15 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                    Button(onClick = { times.add("") }, modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = { times.add("") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkGreen)
+                    ) {
                         Text("Add Another Time")
                     }
                 }
             }
-
-            // Flexible Scheduling - Frequency Type
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -267,7 +254,7 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    FlowRow( // Corrected FlowRow usage
+                    FlowRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -290,8 +277,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     }
                 }
             }
-
-            // Specific Days Selection (only if "Specific Days" is selected)
             if (frequencyType == "Specific Days") {
                 item {
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -306,7 +291,7 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                             Calendar.THURSDAY to "Thu", Calendar.FRIDAY to "Fri",
                             Calendar.SATURDAY to "Sat"
                         )
-                        FlowRow( // Corrected FlowRow usage
+                        FlowRow(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -335,8 +320,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     }
                 }
             }
-
-            // Refill Reminders
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -372,8 +355,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     )
                 }
             }
-
-            // Detailed Medicine Information
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -403,9 +384,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     )
                 }
             }
-
-
-            // Photo Placeholder and Capture Button
             item {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -430,49 +408,26 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    Button(
+                        onClick = {
+                            when (PackageManager.PERMISSION_GRANTED) {
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.CAMERA
+                                ) -> {
+                                    takePicturePreview.launch()
+                                }
 
-                    val takePicturePreview = rememberLauncherForActivityResult(
-                        ActivityResultContracts.TakePicturePreview()
-                    ) { bitmap ->
-                        if (bitmap != null) {
-                            val file = saveBitmapToCache(context, bitmap)
-//                            uploadImage(file)
-                        }
+                                else -> {
+                                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkGreen)
+                    ) {
+                        Text("Add Photo")
                     }
-
-                    Button(onClick = {
-                        takePicturePreview.launch()
-                    }) {
-                        Text("Take Photo")
-                    }
-
-
-//                    Button(
-//                        onClick = {
-//                            when (PackageManager.PERMISSION_GRANTED) {
-//                                ContextCompat.checkSelfPermission(
-//                                    context,
-//                                    Manifest.permission.CAMERA
-//                                ) -> {
-//                                    val file = createImageFile(context)
-//                                    val uri = FileProvider.getUriForFile(
-//                                        context,
-//                                        "${context.packageName}.fileprovider",
-//                                        file
-//                                    )
-//                                    tempPhotoUri.value = uri
-//                                    takePictureLauncher.launch(uri)
-//                                }
-//
-//                                else -> {
-//                                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-//                                }
-//                            }
-//                        },
-//                        modifier = Modifier.fillMaxWidth()
-//                    ) {
-//                        Text("Add Photo")
-//                    }
                 }
             }
 
@@ -505,14 +460,12 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                                 purpose = purpose.ifBlank { null }
                             )
 
-                            // Check for POST_NOTIFICATIONS permission on Android 13+
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 if (ContextCompat.checkSelfPermission(
                                         context,
                                         Manifest.permission.POST_NOTIFICATIONS
                                     ) == PackageManager.PERMISSION_GRANTED
                                 ) {
-                                    // Check for SCHEDULE_EXACT_ALARM permission on Android 12+
                                     if (NotificationScheduler.canScheduleExactAlarms(context)) {
                                         viewModel.viewModelScope.launch {
                                             val medicineId = viewModel.insert(newMedicine).toInt()
@@ -520,7 +473,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                                             navController.popBackStack()
                                         }
                                     } else {
-                                        // Request SCHEDULE_EXACT_ALARM permission
                                         val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                                             data = Uri.fromParts("package", context.packageName, null)
                                         }
@@ -528,12 +480,10 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                                         Toast.makeText(context, "Please grant 'Alarms & reminders' permission in settings.", Toast.LENGTH_LONG).show()
                                     }
                                 } else {
-                                    // Request POST_NOTIFICATIONS permission
                                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                     Toast.makeText(context, "Please grant notification permission to set reminders.", Toast.LENGTH_LONG).show()
                                 }
-                            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) to Android 12L (API 32)
-                                // Only SCHEDULE_EXACT_ALARM is required here, POST_NOTIFICATIONS is runtime for 33+
+                            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { 
                                 if (NotificationScheduler.canScheduleExactAlarms(context)) {
                                     viewModel.viewModelScope.launch {
                                         val medicineId = viewModel.insert(newMedicine).toInt()
@@ -549,7 +499,6 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                                 }
                             }
                             else {
-                                // For older Android versions, permissions are granted at install time
                                 viewModel.viewModelScope.launch {
                                     val medicineId = viewModel.insert(newMedicine).toInt()
                                     NotificationScheduler.scheduleAllNotifications(context, newMedicine.copy(id = medicineId))
@@ -563,17 +512,16 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(containerColor = DarkGreen)
                 ) {
                     Text("Save Medicine", fontSize = 18.sp)
                 }
             }
         }
 
-        // Time Picker Dialog
         if (showTimePicker.value) {
             val calendar = Calendar.getInstance()
-            // Try to parse existing time to pre-fill picker, otherwise use current time
             val existingTime = times.getOrNull(timePickerIndex.value)
             val initialHour = existingTime?.split(":")?.getOrNull(0)?.toIntOrNull() ?: calendar.get(
                 Calendar.HOUR_OF_DAY
@@ -587,12 +535,12 @@ fun AddMedicineScreen(navController: NavController, viewModel: MedicineViewModel
                 context,
                 { _, selectedHour: Int, selectedMinute: Int ->
                     val newTime = String.format("%02d:%02d", selectedHour, selectedMinute)
-                    times[timePickerIndex.value] = newTime // Update the specific time in the list
+                    times[timePickerIndex.value] = newTime
                     showTimePicker.value = false
                 },
                 initialHour,
                 initialMinute,
-                true // 24 hour format for internal storage, can format for display
+                true
             ).apply {
                 setOnDismissListener { showTimePicker.value = false }
             }.show()
@@ -606,15 +554,4 @@ fun saveBitmapToCache(context: Context, bitmap: Bitmap): File {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it)
     }
     return file
-}
-
-
-fun createImageFile(context: Context): File {
-    val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val storageDir: File? = context.getExternalFilesDir(null)
-    return File.createTempFile(
-        "JPEG_${timeStamp}_",
-        ".jpg",
-        storageDir
-    )
 }

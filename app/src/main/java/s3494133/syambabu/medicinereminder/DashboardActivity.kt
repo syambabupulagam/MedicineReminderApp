@@ -38,8 +38,10 @@ import androidx.navigation.NavHostController
 import s3494133.syambabu.medicinereminder.ui.theme.Blue
 import s3494133.syambabu.medicinereminder.ui.theme.LightLavender
 import s3494133.syambabu.medicinereminder.ui.theme.LightPink
+import s3494133.syambabu.medicinereminder.ui.theme.LiteGreen
 import s3494133.syambabu.medicinereminder.ui.theme.Orange
 import s3494133.syambabu.medicinereminder.ui.theme.PurpleDeep
+import s3494133.syambabu.medicinereminder.utils.NavigationScreens
 import s3494133.syambabu.medicinereminder.utils.UserPrefs
 
 
@@ -113,9 +115,10 @@ fun DashboardScreen(navController: NavController) {
                 description = "Set name, dosage, time, and frequency.",
                 icon = R.drawable.iv_add_medicine,
                 onClick = {
-                    navController.navigate("add_medicine")
+                    navController.navigate(NavigationScreens.AddMedicine.route)
+
                 },
-                Blue
+                LiteGreen
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -123,7 +126,9 @@ fun DashboardScreen(navController: NavController) {
                 title = "Scheduled Medicines",
                 description = "See all your upcoming medicine schedules.",
                 icon = R.drawable.iv_schedule_medicine,
-                onClick = { },
+                onClick = {
+                    navController.navigate(NavigationScreens.ViewMedicine.route)
+                },
                 LightPink
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -133,8 +138,9 @@ fun DashboardScreen(navController: NavController) {
                 description = "View past intake records for each medicine.",
                 icon = R.drawable.iv_medicine_history,
                 onClick = {
+                    navController.navigate(NavigationScreens.GlobalMedicineHistoryList.route)
                 },
-                Blue
+                LiteGreen
             )
 
             Spacer(modifier = Modifier.height(16.dp))

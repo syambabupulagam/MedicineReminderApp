@@ -1,4 +1,4 @@
-package s3494133.syambabu.medicinereminder
+package s3494133.syambabu.medicinereminder.utils
 
 sealed class NavigationScreens(val route: String) {
     object Splash : NavigationScreens("splash_route")
@@ -6,4 +6,6 @@ sealed class NavigationScreens(val route: String) {
     object Login : NavigationScreens("login")
     object Register : NavigationScreens("register")
     object AddMedicine : NavigationScreens("add_medicine")
+    object ViewMedicine : NavigationScreens("view_medicines")
+    object GlobalMedicineHistoryList : NavigationScreens("global_medicine_history_list")
 }

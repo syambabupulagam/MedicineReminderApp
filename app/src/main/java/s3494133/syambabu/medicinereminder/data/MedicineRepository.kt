@@ -1,5 +1,4 @@
-package s3494133.syambabu.medicinereminder.utils
-
+package s3494133.syambabu.medicinereminder.data
 
 import kotlinx.coroutines.flow.Flow
 
