@@ -152,7 +152,7 @@ fun SignUpScreen(navController: NavController) {
                                 set(Calendar.MILLISECOND, 0)
                             }.timeInMillis
 
-                            openDatePicker({ dobDate = it }, today)
+                            openDatePicker({ dobDate = it }, 1900)
                         }
                     )
                     Spacer(modifier = Modifier.height(6.dp)) // Space between fields

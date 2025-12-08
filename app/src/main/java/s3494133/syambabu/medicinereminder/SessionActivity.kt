@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -126,7 +125,8 @@ fun SessionActivityScreen(navController: NavController) {
                                 Icons.Filled.Visibility
                             else Icons.Filled.VisibilityOff
 
-                            val description = if (passwordVisible) "Hide password" else "Show password"
+                            val description =
+                                if (passwordVisible) "Hide password" else "Show password"
 
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(imageVector = image, description)
@@ -183,13 +183,26 @@ fun SessionActivityScreen(navController: NavController) {
                     ) {
                         Text(text = "Sign In", fontSize = 16.sp)
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+
+
+                    Text(
+                        modifier = Modifier.clickable{
+                            navController.navigate(NavigationScreens.ForgotPassword.route)
+                        },
+                        text = "I Forgot my password! Reset Now",
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+
                     Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
 
                     // Sign Up text section
                     Row(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
-                        Text(text = "You are a new user ?", fontSize = 14.sp)
+                        Text(text = "You are a new user ?", color = Color.White,  fontSize = 14.sp)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Sign Up",
@@ -218,7 +231,12 @@ fun SessionActivityScreen(navController: NavController) {
     )
 }
 
-fun loginUser(loginInput: String, password: String, context: Context, navController: NavController) {
+fun loginUser(
+    loginInput: String,
+    password: String,
+    context: Context,
+    navController: NavController
+) {
 
     val db = FirebaseDatabase.getInstance().getReference("PatientAccounts")
 
@@ -291,12 +309,12 @@ fun loginUser(loginInput: String, password: String, context: Context, navControl
             }
 
             if (!found) {
-                Toast.makeText(context, "No account with this phone number", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "No account with this phone number", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
 }
-
 
 
 @Preview(showBackground = true)
