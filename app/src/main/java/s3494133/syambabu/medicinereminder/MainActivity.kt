@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import android.content.ContextWrapper
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -45,6 +46,7 @@ import s3494133.syambabu.medicinereminder.ui.theme.MedicineReminderTheme
 import s3494133.syambabu.medicinereminder.ui.theme.OrangeDeep
 import s3494133.syambabu.medicinereminder.data.MedicineViewModel
 import s3494133.syambabu.medicinereminder.homenavigations.GlobalMedicineHistoryListScreen
+import s3494133.syambabu.medicinereminder.homenavigations.MedicineHistoryScreen
 import s3494133.syambabu.medicinereminder.homenavigations.MedicineListScreen
 import s3494133.syambabu.medicinereminder.ui.theme.DarkGreen
 import s3494133.syambabu.medicinereminder.utils.NavigationScreens
@@ -83,12 +85,22 @@ fun MedicineReminderApp() {
         composable(NavigationScreens.Login.route) {
             SessionActivityScreen(navController = navController)
         }
+
+        composable(NavigationScreens.ForgotPassword.route) {
+            ForgotPasswordScreen(navController = navController)
+        }
+
         composable(NavigationScreens.Register.route) {
             SignUpScreen(navController = navController)
         }
         composable(NavigationScreens.Home.route) {
             DashboardScreen(navController = navController)
         }
+
+        composable(NavigationScreens.Profile.route) {
+            ProfileScreen(navController = navController)
+        }
+
         composable(NavigationScreens.AddMedicine.route) {
             AddMedicineScreen(navController = navController, viewModel = viewModel)
         }
@@ -98,6 +110,16 @@ fun MedicineReminderApp() {
         }
         composable(NavigationScreens.GlobalMedicineHistoryList.route) {
             GlobalMedicineHistoryListScreen(navController = navController, viewModel = viewModel)
+        }
+
+        composable("medicine_history/{medicineId}") { backStackEntry ->
+            val medicineId = backStackEntry.arguments?.getString("medicineId")?.toIntOrNull()
+            if (medicineId != null) {
+                MedicineHistoryScreen(navController = navController, viewModel = viewModel, medicineId = medicineId)
+            } else {
+                Toast.makeText(LocalContext.current, "Medicine ID not found for history.", Toast.LENGTH_SHORT).show()
+                navController.popBackStack()
+            }
         }
 
 

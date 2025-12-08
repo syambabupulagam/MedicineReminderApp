@@ -1,9 +1,11 @@
 package s3494133.syambabu.medicinereminder
 
+import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +49,9 @@ import com.google.firebase.database.FirebaseDatabase
 import s3494133.syambabu.medicinereminder.ui.theme.DarkGreen
 import s3494133.syambabu.medicinereminder.utils.CryptoUtils
 import s3494133.syambabu.medicinereminder.utils.NavigationScreens
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 
 @Composable
@@ -60,6 +64,35 @@ fun SignUpScreen(navController: NavController) {
     var errorMessage by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val context1 = LocalContext.current
+
+    var dobDate by remember { mutableStateOf("") }
+
+    val calendar = Calendar.getInstance()
+    val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+
+    fun openDatePicker(onSelect: (String) -> Unit, minDate: Long? = null) {
+        val dp = DatePickerDialog(
+            context1,
+            { _, year, month, day ->
+                val c = Calendar.getInstance().apply {
+                    set(year, month, day)
+                }
+                onSelect(dateFormat.format(c.time))
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+
+        dp.datePicker.calendarViewShown = true
+        dp.datePicker.spinnersShown = true
+
+        if (minDate != null) dp.datePicker.minDate = minDate
+
+        dp.show()
+    }
 
 
 
@@ -105,6 +138,23 @@ fun SignUpScreen(navController: NavController) {
                         label = { Text("Enter Your Name") }
                     )
 
+                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+
+
+                    DOBDateField(
+                        label = "Date of Birth",
+                        value = dobDate,
+                        onClick = {
+                            val today = Calendar.getInstance().apply {
+                                set(Calendar.HOUR_OF_DAY, 0)
+                                set(Calendar.MINUTE, 0)
+                                set(Calendar.SECOND, 0)
+                                set(Calendar.MILLISECOND, 0)
+                            }.timeInMillis
+
+                            openDatePicker({ dobDate = it }, today)
+                        }
+                    )
                     Spacer(modifier = Modifier.height(6.dp)) // Space between fields
 
                     TextField(
@@ -167,7 +217,8 @@ fun SignUpScreen(navController: NavController) {
                                 Icons.Filled.Visibility
                             else Icons.Filled.VisibilityOff
 
-                            val description = if (passwordVisible) "Hide password" else "Show password"
+                            val description =
+                                if (passwordVisible) "Hide password" else "Show password"
 
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(imageVector = image, description)
@@ -230,48 +281,91 @@ fun SignUpScreen(navController: NavController) {
 
                                 else -> {
 
+                                    // First encrypt password
                                     val encryptedPassword = CryptoUtils.encrypt(password)
-                                    val userData = PatientData(
-                                        name = name,
-                                        email = email,
-                                        age = age,
-                                        phone = phonenumber,
-                                        password = encryptedPassword
-                                    )
 
+                                    val ref = FirebaseDatabase.getInstance()
+                                        .getReference("PatientAccounts")
 
-                                    val db = FirebaseDatabase.getInstance()
-                                    val ref = db.getReference("PatientAccounts")
-                                    ref.child(userData.email.replace(".", ",")).setValue(userData)
-                                        .addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
+                                    val emailKey = email.replace(".", ",")
 
+                                    ref.child(emailKey).get()
+                                        .addOnSuccessListener { emailSnapshot ->
+
+                                            if (emailSnapshot.exists()) {
                                                 Toast.makeText(
                                                     context,
-                                                    "Registration Successful",
+                                                    "Email already registered!",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
+                                                return@addOnSuccessListener
+                                            }
 
+                                            // STEP 2: Check if phone already registered (loop through all users)
+                                            ref.get().addOnSuccessListener { allUsersSnapshot ->
 
-                                                navController.navigate(NavigationScreens.Login.route) {
-                                                    popUpTo(NavigationScreens.Register.route) {
-                                                        inclusive = true
+                                                var phoneExists = false
+
+                                                for (child in allUsersSnapshot.children) {
+                                                    val savedPhone =
+                                                        child.child("phone").value?.toString() ?: ""
+                                                    if (savedPhone == phonenumber) {
+                                                        phoneExists = true
+                                                        break
                                                     }
                                                 }
-                                            } else {
-                                                Toast.makeText(
-                                                    context,
-                                                    "User Registration Failed: ${task.exception?.message}",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+
+                                                if (phoneExists) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Phone number already registered!",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    return@addOnSuccessListener
+                                                }
+
+                                                // STEP 3: If email + phone both are free → Register user
+                                                val userData = PatientData(
+                                                    name = name,
+                                                    dob = dobDate,
+                                                    email = email,
+                                                    age = age,
+                                                    phone = phonenumber,
+                                                    password = encryptedPassword
+                                                )
+
+                                                ref.child(emailKey).setValue(userData)
+                                                    .addOnCompleteListener { task ->
+                                                        if (task.isSuccessful) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Registration Successful",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+
+                                                            navController.navigate(NavigationScreens.Login.route) {
+                                                                popUpTo(NavigationScreens.Register.route) {
+                                                                    inclusive = true
+                                                                }
+                                                            }
+                                                        } else {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Registration Failed: ${task.exception?.message}",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                    }
+                                                    .addOnFailureListener { exception ->
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Registration Failed: ${exception.message}",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+
                                             }
-                                        }
-                                        .addOnFailureListener { exception ->
-                                            Toast.makeText(
-                                                context,
-                                                "User Registration Failed: ${exception.message}",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+
                                         }
 
                                 }
@@ -324,11 +418,39 @@ fun SignUpScreen(navController: NavController) {
 data class PatientData
     (
     var name: String = "",
+    var dob: String = "",
     var age: String = "",
     var email: String = "",
     var phone: String = "",
     var password: String = "",
 )
+
+
+@Composable
+fun DOBDateField(label: String, value: String, onClick: () -> Unit) {
+    Column {
+
+        Box {
+            TextField(
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                placeholder = { Text("Select DOB") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            )
+            Box(
+                Modifier
+                    .matchParentSize()
+                    .clickable { onClick() }
+            )
+        }
+    }
+}
 
 
 @Preview(showBackground = true)

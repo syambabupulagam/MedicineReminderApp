@@ -76,7 +76,10 @@ fun DashboardScreen(navController: NavController) {
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = { // Add actions block for trailing icons
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        navController.navigate(NavigationScreens.Profile.route)
+
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Profile",
