@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         NotificationScheduler.createNotificationChannels(this)
 
+
         setContent {
             MedicineReminderTheme {
                 MedicineReminderApp()

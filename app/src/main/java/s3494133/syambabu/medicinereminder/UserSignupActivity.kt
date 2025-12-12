@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -194,9 +196,26 @@ fun SignUpScreen(navController: NavController) {
                                 shape = RoundedCornerShape(16.dp)
                             ),
                         value = phonenumber,
-                        onValueChange = { phonenumber = it },
-                        label = { Text("Enter Your Phone Number") }
+                        onValueChange = { input ->
+                            // Allow ONLY digits
+                            val digitsOnly = input.filter { it.isDigit() }
+
+                            // Limit length to 10 digits
+                            phonenumber = digitsOnly.take(10)
+                        },
+                        label = { Text("Enter Your Phone Number") },
+                        leadingIcon = {
+                            Text(
+                                text = "+44",
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
+
+
 
                     Spacer(modifier = Modifier.height(6.dp)) // Space between fields
 
@@ -387,7 +406,7 @@ fun SignUpScreen(navController: NavController) {
                     Row(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
-                        Text(text = "You are a old user ?", fontSize = 14.sp)
+                        Text(text = "You are a old user ?",color = Color.White, fontSize = 14.sp)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Sign In",
