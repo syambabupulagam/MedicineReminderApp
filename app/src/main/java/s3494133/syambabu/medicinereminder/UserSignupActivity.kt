@@ -81,7 +81,24 @@ fun SignUpScreen(navController: NavController) {
                 val c = Calendar.getInstance().apply {
                     set(year, month, day)
                 }
-                onSelect(dateFormat.format(c.time))
+
+                // ✅ DOB string
+                val selectedDob = dateFormat.format(c.time)
+                onSelect(selectedDob)
+
+                // ✅ Calculate age automatically
+                val today = Calendar.getInstance()
+                var calculatedAge = today.get(Calendar.YEAR) - year
+
+                // Adjust age if birthday has not occurred yet this year
+                if (
+                    today.get(Calendar.MONTH) < month ||
+                    (today.get(Calendar.MONTH) == month && today.get(Calendar.DAY_OF_MONTH) < day)
+                ) {
+                    calculatedAge--
+                }
+
+                age = calculatedAge.toString()
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -93,8 +110,12 @@ fun SignUpScreen(navController: NavController) {
 
         if (minDate != null) dp.datePicker.minDate = minDate
 
+        // ✅ DOB → block future dates
+        dp.datePicker.maxDate = System.currentTimeMillis()
+
         dp.show()
     }
+
 
 
 
@@ -167,9 +188,11 @@ fun SignUpScreen(navController: NavController) {
                                 shape = RoundedCornerShape(16.dp)
                             ),
                         value = age,
-                        onValueChange = { age = it },
-                        label = { Text("Enter Your Age") }
+                        onValueChange = { },
+                        label = { Text("Age") },
+                        readOnly = true
                     )
+
 
                     Spacer(modifier = Modifier.height(6.dp)) // Space between fields
 

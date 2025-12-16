@@ -102,6 +102,12 @@ fun HistoryMedicineListItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                Text(
+                    text = "Quantity remaining: ${medicine.currentQuantity}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             IconButton(
                 onClick = { onDelete(medicine) },

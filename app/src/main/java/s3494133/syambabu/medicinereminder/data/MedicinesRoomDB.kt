@@ -57,7 +57,9 @@ data class Medicine(
     val refillThreshold: Int?,
     val notes: String?,
     val sideEffects: String?,
-    val purpose: String?
+    val purpose: String?,
+    val takenTimesToday: List<String> = emptyList(), // IMPORTANT
+    val lastTakenDate: String? = null
 )
 
 @Entity(tableName = "medicine_history")

@@ -64,7 +64,7 @@ open class MedicineViewModel(application: Application) : AndroidViewModel(applic
         return repository.getMedicineById(medicineId)
     }
 
-    fun markMedicineTaken(medicineId: Int, dosage: String) = viewModelScope.launch {
+    fun markMedicineTakenOld(medicineId: Int, dosage: String) = viewModelScope.launch {
         ensureRepositoryInitialized()
         repository.insertMedicineHistory(
             MedicineHistory(
@@ -79,6 +79,30 @@ open class MedicineViewModel(application: Application) : AndroidViewModel(applic
             repository.update(it.copy(currentQuantity = max(0, newQuantity)))
         }
     }
+
+    fun markMedicineTaken(updatedMedicine: Medicine) = viewModelScope.launch {
+        ensureRepositoryInitialized()
+
+        // 1️⃣ Insert history
+        repository.insertMedicineHistory(
+            MedicineHistory(
+                medicineId = updatedMedicine.id,
+                takenTimestamp = System.currentTimeMillis(),
+                dosageTaken = updatedMedicine.dosage
+            )
+        )
+
+        // 2️⃣ Reduce quantity
+        val newQuantity = (updatedMedicine.currentQuantity ?: 0) - 1
+
+        // 3️⃣ SAVE UPDATED MEDICINE (THIS IS THE KEY)
+        repository.update(
+            updatedMedicine.copy(
+                currentQuantity = max(0, newQuantity)
+            )
+        )
+    }
+
 
     fun getMedicineHistoryForMedicine(medicineId: Int): Flow<List<MedicineHistory>> {
         ensureRepositoryInitialized()
