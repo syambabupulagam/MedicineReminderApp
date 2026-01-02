@@ -83,7 +83,6 @@ open class MedicineViewModel(application: Application) : AndroidViewModel(applic
     fun markMedicineTaken(updatedMedicine: Medicine) = viewModelScope.launch {
         ensureRepositoryInitialized()
 
-        // 1️⃣ Insert history
         repository.insertMedicineHistory(
             MedicineHistory(
                 medicineId = updatedMedicine.id,
@@ -92,10 +91,8 @@ open class MedicineViewModel(application: Application) : AndroidViewModel(applic
             )
         )
 
-        // 2️⃣ Reduce quantity
         val newQuantity = (updatedMedicine.currentQuantity ?: 0) - 1
 
-        // 3️⃣ SAVE UPDATED MEDICINE (THIS IS THE KEY)
         repository.update(
             updatedMedicine.copy(
                 currentQuantity = max(0, newQuantity)
@@ -109,7 +106,6 @@ open class MedicineViewModel(application: Application) : AndroidViewModel(applic
         return repository.getMedicineHistoryForMedicine(medicineId)
     }
 
-    // New: Function to delete all history for a specific medicine
     fun deleteHistoryForMedicine(medicineId: Int) = viewModelScope.launch {
         ensureRepositoryInitialized()
         repository.deleteHistoryForMedicine(medicineId)

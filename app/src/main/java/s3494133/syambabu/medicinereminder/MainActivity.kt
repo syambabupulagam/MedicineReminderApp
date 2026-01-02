@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -43,21 +41,20 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import s3494133.syambabu.medicinereminder.homenavigations.AddMedicineScreen
 import s3494133.syambabu.medicinereminder.ui.theme.MedicineReminderTheme
-import s3494133.syambabu.medicinereminder.ui.theme.OrangeDeep
 import s3494133.syambabu.medicinereminder.data.MedicineViewModel
+import s3494133.syambabu.medicinereminder.homenavigations.AboutUsScreen
 import s3494133.syambabu.medicinereminder.homenavigations.GlobalMedicineHistoryListScreen
 import s3494133.syambabu.medicinereminder.homenavigations.MedicineHistoryScreen
 import s3494133.syambabu.medicinereminder.homenavigations.MedicineListScreen
 import s3494133.syambabu.medicinereminder.ui.theme.DarkGreen
 import s3494133.syambabu.medicinereminder.utils.NavigationScreens
 import s3494133.syambabu.medicinereminder.utils.NotificationScheduler
-import s3494133.syambabu.medicinereminder.utils.UserPrefs
+import s3494133.syambabu.medicinereminder.utils.UserLocalData
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         NotificationScheduler.createNotificationChannels(this)
-
 
         setContent {
             MedicineReminderTheme {
@@ -102,6 +99,10 @@ fun MedicineReminderApp() {
             ProfileScreen(navController = navController)
         }
 
+        composable(NavigationScreens.AboutUs.route) {
+            AboutUsScreen(navController = navController)
+        }
+
         composable(NavigationScreens.AddMedicine.route) {
             AddMedicineScreen(navController = navController, viewModel = viewModel)
         }
@@ -136,7 +137,7 @@ fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         delay(3000)
 
-        val patientStatus = UserPrefs.checkLoginStatus(context)
+        val patientStatus = UserLocalData.checkLoginStatus(context)
         if (patientStatus) {
             navController.navigate(NavigationScreens.Home.route) {
                 popUpTo(NavigationScreens.Splash.route) {

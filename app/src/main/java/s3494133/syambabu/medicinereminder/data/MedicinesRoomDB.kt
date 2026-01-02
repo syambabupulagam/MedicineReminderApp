@@ -17,9 +17,6 @@ import androidx.room.TypeConverters
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
-// --- 1. Data Models ---
-
-// Type Converters for Room to store List<String> and List<Int>
 class Converters {
     @TypeConverter
     fun fromStringList(value: String?): List<String>? {
@@ -42,7 +39,6 @@ class Converters {
     }
 }
 
-// Medicine Entity (Updated)
 @Entity(tableName = "medicines")
 data class Medicine(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -58,7 +54,7 @@ data class Medicine(
     val notes: String?,
     val sideEffects: String?,
     val purpose: String?,
-    val takenTimesToday: List<String> = emptyList(), // IMPORTANT
+    val takenTimesToday: List<String> = emptyList(),
     val lastTakenDate: String? = null
 )
 
@@ -70,11 +66,10 @@ data class MedicineHistory(
     val dosageTaken: String
 )
 
-// --- 2. Room Database Setup ---
 @Dao
 interface MedicineDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMedicine(medicine: Medicine): Long // Return row ID for new medicine
+    suspend fun insertMedicine(medicine: Medicine): Long
 
     @Update
     suspend fun updateMedicine(medicine: Medicine)
@@ -97,7 +92,6 @@ interface MedicineHistoryDao {
     @Query("SELECT * FROM medicine_history WHERE medicineId = :medicineId ORDER BY takenTimestamp DESC")
     fun getMedicineHistoryForMedicine(medicineId: Int): Flow<List<MedicineHistory>>
 
-    // New: Delete all history entries for a specific medicine
     @Query("DELETE FROM medicine_history WHERE medicineId = :medicineId")
     suspend fun deleteHistoryForMedicine(medicineId: Int)
 }
@@ -107,7 +101,7 @@ interface MedicineHistoryDao {
     version = 1,
     exportSchema = false
 )
-@TypeConverters(Converters::class) // Register the Type Converters
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun medicineDao(): MedicineDao
     abstract fun medicineHistoryDao(): MedicineHistoryDao

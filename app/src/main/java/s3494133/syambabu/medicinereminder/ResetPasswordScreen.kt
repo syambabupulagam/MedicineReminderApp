@@ -77,9 +77,6 @@ fun ForgotPasswordScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // ==========================
-            // STEP 1 — VERIFY EMAIL + DOB
-            // ==========================
 
             if (!step2) {
 
@@ -156,9 +153,6 @@ fun ForgotPasswordScreen(navController: NavController) {
                 }
             }
 
-            // ==========================
-            // STEP 2 — RESET PASSWORD
-            // ==========================
 
             if (step2) {
 

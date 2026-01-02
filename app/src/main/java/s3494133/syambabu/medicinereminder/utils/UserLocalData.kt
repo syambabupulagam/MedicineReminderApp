@@ -3,7 +3,7 @@ package s3494133.syambabu.medicinereminder.utils
 import android.content.Context
 
 
-object UserPrefs {
+object UserLocalData {
 
     private const val PREFS_NAME = "POST_PREFS"
     private const val KEY_IS_USER_LOGGED_IN = "KEY_IS_USER_LOGGED_IN"

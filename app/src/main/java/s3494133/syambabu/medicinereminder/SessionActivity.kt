@@ -49,7 +49,7 @@ import com.google.firebase.database.FirebaseDatabase
 import s3494133.syambabu.medicinereminder.ui.theme.DarkGreen
 import s3494133.syambabu.medicinereminder.utils.CryptoUtils
 import s3494133.syambabu.medicinereminder.utils.NavigationScreens
-import s3494133.syambabu.medicinereminder.utils.UserPrefs
+import s3494133.syambabu.medicinereminder.utils.UserLocalData
 
 
 @Composable
@@ -84,12 +84,11 @@ fun SessionActivityScreen(navController: NavController) {
                 )
 
 
-                // Bottom section with email, password fields, and sign-in button on a white background
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .padding(16.dp), // Padding for the fields
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
@@ -106,7 +105,7 @@ fun SessionActivityScreen(navController: NavController) {
                         label = { Text("Enter Your Email/PhoneNumber") }
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     // Password Text Field
                     TextField(
@@ -184,7 +183,7 @@ fun SessionActivityScreen(navController: NavController) {
                         Text(text = "Sign In", fontSize = 16.sp)
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+                    Spacer(modifier = Modifier.height(24.dp))
 
 
                     Text(
@@ -196,7 +195,7 @@ fun SessionActivityScreen(navController: NavController) {
                         fontSize = 14.sp
                     )
 
-                    Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
+                    Spacer(modifier = Modifier.weight(1f))
 
                     // Sign Up text section
                     Row(
@@ -208,7 +207,7 @@ fun SessionActivityScreen(navController: NavController) {
                             text = "Sign Up",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White, // Blue text color for "Sign Up"
+                            color = Color.White,
                             modifier = Modifier.clickable {
 
                                 navController.navigate(NavigationScreens.Register.route) {
@@ -221,7 +220,7 @@ fun SessionActivityScreen(navController: NavController) {
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+                    Spacer(modifier = Modifier.height(24.dp))
 
 
                 }
@@ -240,7 +239,6 @@ fun loginUser(
 
     val db = FirebaseDatabase.getInstance().getReference("PatientAccounts")
 
-    // First: try login as Email
     if (loginInput.contains("@")) {
 
         val emailKey = loginInput.replace(".", ",")
@@ -253,12 +251,12 @@ fun loginUser(
                 if (decryptedPassword == password) {
                     Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
 
-                    UserPrefs.markLoginStatus(context, true)
-                    UserPrefs.saveEmail(
+                    UserLocalData.markLoginStatus(context, true)
+                    UserLocalData.saveEmail(
                         context,
                         email = loginInput
                     )
-                    UserPrefs.saveName(context, snapshot.child("name").value.toString())
+                    UserLocalData.saveName(context, snapshot.child("name").value.toString())
 
 
 
@@ -275,7 +273,6 @@ fun loginUser(
         }
 
     } else {
-        // Second: login using Phone number
         db.get().addOnSuccessListener { snapshot ->
             var found = false
 
@@ -288,12 +285,12 @@ fun loginUser(
                     found = true
                     if (decryptedPassword == password) {
 
-                        UserPrefs.markLoginStatus(context, true)
-                        UserPrefs.saveEmail(
+                        UserLocalData.markLoginStatus(context, true)
+                        UserLocalData.saveEmail(
                             context,
                             email = child.child("email").value.toString()
                         )
-                        UserPrefs.saveName(context, child.child("name").value.toString())
+                        UserLocalData.saveName(context, child.child("name").value.toString())
 
                         Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
 

@@ -57,9 +57,9 @@ fun MedicineHistoryScreen(navController: NavController, viewModel: MedicineViewM
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack, // Changed to AutoMirrored
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White // Set icon color
+                            tint = Color.White
                         )
                     }
                 },
@@ -91,21 +91,20 @@ fun MedicineHistoryScreen(navController: NavController, viewModel: MedicineViewM
             } else {
                 LazyColumn(
                     modifier = Modifier
-                        .weight(1f) // Take available space
+                        .weight(1f)
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp), // Increased horizontal padding
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     contentPadding = PaddingValues(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp) // More space between history items
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(medicineHistory) { historyEntry ->
-                        MedicineHistoryItem(historyEntry = historyEntry) // Using the dedicated item composable
+                        MedicineHistoryItem(historyEntry = historyEntry)
                     }
                 }
             }
 
-            // "Delete All History" Button at the bottom
             if (medicineHistory.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp)) // Space above the button
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
                         viewModel.deleteHistoryForMedicine(medicineId)
@@ -113,10 +112,10 @@ fun MedicineHistoryScreen(navController: NavController, viewModel: MedicineViewM
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp) // Horizontal padding for the button
+                        .padding(horizontal = 16.dp)
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    shape = RoundedCornerShape(12.dp) // Rounded button
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Delete All History")
                 }

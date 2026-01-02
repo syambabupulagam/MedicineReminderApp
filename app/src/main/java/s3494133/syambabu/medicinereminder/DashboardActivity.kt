@@ -35,14 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import s3494133.syambabu.medicinereminder.ui.theme.Blue
 import s3494133.syambabu.medicinereminder.ui.theme.LightLavender
 import s3494133.syambabu.medicinereminder.ui.theme.LightPink
 import s3494133.syambabu.medicinereminder.ui.theme.LiteGreen
 import s3494133.syambabu.medicinereminder.ui.theme.Orange
-import s3494133.syambabu.medicinereminder.ui.theme.PurpleDeep
 import s3494133.syambabu.medicinereminder.utils.NavigationScreens
-import s3494133.syambabu.medicinereminder.utils.UserPrefs
+import s3494133.syambabu.medicinereminder.utils.UserLocalData
 
 
 @Preview(showBackground = true)
@@ -58,7 +56,7 @@ fun DashboardScreen(navController: NavController) {
     val context = LocalContext.current
 
 
-    val userName = UserPrefs.getName(context)
+    val userName = UserLocalData.getName(context)
 
 
     Scaffold(
@@ -153,6 +151,7 @@ fun DashboardScreen(navController: NavController) {
                 description = "Learn more about the app and contact us.",
                 icon = R.drawable.iv_aboutus, // Using Info icon
                 onClick = {
+                    navController.navigate(NavigationScreens.AboutUs.route)
                 },
                 LightLavender
             )
@@ -187,8 +186,8 @@ fun DashboardCard(
 
 
             Icon(
-                painter = painterResource(id = icon), // Pass your drawable resource here
-                contentDescription = null, // Provide a meaningful description if it's not purely decorative
+                painter = painterResource(id = icon),
+                contentDescription = null,
                 modifier = Modifier.size(48.dp)
             )
 

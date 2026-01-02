@@ -191,7 +191,7 @@ fun GlobalMedicineHistoryListScreen(navController: NavController, viewModel: Med
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 items(medicines) { medicine ->
-                    HistoryMedicineListItem( // Using the new HistoryMedicineListItem
+                    HistoryMedicineListItem(
                         medicine = medicine,
                         onDelete = {
                             viewModel.delete(it)

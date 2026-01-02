@@ -82,15 +82,12 @@ fun SignUpScreen(navController: NavController) {
                     set(year, month, day)
                 }
 
-                // ✅ DOB string
                 val selectedDob = dateFormat.format(c.time)
                 onSelect(selectedDob)
 
-                // ✅ Calculate age automatically
                 val today = Calendar.getInstance()
                 var calculatedAge = today.get(Calendar.YEAR) - year
 
-                // Adjust age if birthday has not occurred yet this year
                 if (
                     today.get(Calendar.MONTH) < month ||
                     (today.get(Calendar.MONTH) == month && today.get(Calendar.DAY_OF_MONTH) < day)
@@ -110,13 +107,10 @@ fun SignUpScreen(navController: NavController) {
 
         if (minDate != null) dp.datePicker.minDate = minDate
 
-        // ✅ DOB → block future dates
         dp.datePicker.maxDate = System.currentTimeMillis()
 
         dp.show()
     }
-
-
 
 
     val context = LocalContext.current.findActivity()
@@ -145,7 +139,7 @@ fun SignUpScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .padding(16.dp), // Padding for the fields
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
@@ -161,7 +155,7 @@ fun SignUpScreen(navController: NavController) {
                         label = { Text("Enter Your Name") }
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+                    Spacer(modifier = Modifier.height(6.dp))
 
 
                     DOBDateField(
@@ -178,7 +172,7 @@ fun SignUpScreen(navController: NavController) {
                             openDatePicker({ dobDate = it }, 1900)
                         }
                     )
-                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     TextField(
                         modifier = Modifier
@@ -194,7 +188,7 @@ fun SignUpScreen(navController: NavController) {
                     )
 
 
-                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+                    Spacer(modifier = Modifier.height(6.dp))
 
 
                     TextField(
@@ -209,7 +203,7 @@ fun SignUpScreen(navController: NavController) {
                         label = { Text("Enter Your Email") }
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     TextField(
                         modifier = Modifier
@@ -220,10 +214,9 @@ fun SignUpScreen(navController: NavController) {
                             ),
                         value = phonenumber,
                         onValueChange = { input ->
-                            // Allow ONLY digits
+
                             val digitsOnly = input.filter { it.isDigit() }
 
-                            // Limit length to 10 digits
                             phonenumber = digitsOnly.take(10)
                         },
                         label = { Text("Enter Your Phone Number") },
@@ -240,9 +233,8 @@ fun SignUpScreen(navController: NavController) {
 
 
 
-                    Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+                    Spacer(modifier = Modifier.height(6.dp))
 
-                    // Password Text Field
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -268,7 +260,7 @@ fun SignUpScreen(navController: NavController) {
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     if (errorMessage.isNotEmpty()) {
                         Text(
@@ -278,7 +270,7 @@ fun SignUpScreen(navController: NavController) {
                         )
 
                     }
-                    // Sign In Button
+
                     Button(
                         onClick = {
                             when {
@@ -323,7 +315,6 @@ fun SignUpScreen(navController: NavController) {
 
                                 else -> {
 
-                                    // First encrypt password
                                     val encryptedPassword = CryptoUtils.encrypt(password)
 
                                     val ref = FirebaseDatabase.getInstance()
@@ -343,7 +334,6 @@ fun SignUpScreen(navController: NavController) {
                                                 return@addOnSuccessListener
                                             }
 
-                                            // STEP 2: Check if phone already registered (loop through all users)
                                             ref.get().addOnSuccessListener { allUsersSnapshot ->
 
                                                 var phoneExists = false
@@ -366,7 +356,6 @@ fun SignUpScreen(navController: NavController) {
                                                     return@addOnSuccessListener
                                                 }
 
-                                                // STEP 3: If email + phone both are free → Register user
                                                 val userData = PatientData(
                                                     name = name,
                                                     dob = dobDate,
@@ -425,17 +414,16 @@ fun SignUpScreen(navController: NavController) {
                     }
                     Spacer(modifier = Modifier.weight(1f))
 
-                    // Sign Up text section
                     Row(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
-                        Text(text = "You are a old user ?",color = Color.White, fontSize = 14.sp)
+                        Text(text = "You are a old user ?", color = Color.White, fontSize = 14.sp)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Sign In",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White, // Blue text color for "Sign Up"
+                            color = Color.White,
                             modifier = Modifier.clickable {
 
                                 navController.navigate(NavigationScreens.Login.route) {
@@ -448,7 +436,7 @@ fun SignUpScreen(navController: NavController) {
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+                    Spacer(modifier = Modifier.height(24.dp))
 
 
                 }

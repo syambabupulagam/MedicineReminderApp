@@ -164,7 +164,6 @@ fun ScheduleMedicineListItem(
             .format(Date())
     }
 
-    // Reset taken times if day changed
     val takenToday =
         if (medicine.lastTakenDate == todayDate)
             medicine.takenTimesToday
@@ -185,7 +184,6 @@ fun ScheduleMedicineListItem(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            /* -------- HEADER -------- */
 
             Row(verticalAlignment = Alignment.Top) {
 
@@ -253,8 +251,6 @@ fun ScheduleMedicineListItem(
 
             Spacer(Modifier.height(16.dp))
 
-            /* -------- MARK TAKEN BUTTON -------- */
-
             Button(
                 onClick = {
                     nextDoseTime?.let { dose ->
@@ -318,181 +314,3 @@ fun getNextAvailableDose(
 }
 
 
-
-@Composable
-fun ScheduleMedicineListItemOld(
-    medicine: Medicine,
-    onDelete: (Medicine) -> Unit,
-    onMarkTaken: (Medicine) -> Unit,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
-            ) {
-                val photoPainter = if (medicine.photoUri != null) {
-                    rememberAsyncImagePainter(Uri.parse(medicine.photoUri))
-                } else {
-                    painterResource(id = R.drawable.iv_tablet)
-                }
-                Image(
-                    painter = photoPainter,
-                    contentDescription = medicine.name,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Text(
-                            text = medicine.name,
-                            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.weight(1f, fill = false)
-                        )
-                        IconButton(
-                            onClick = { onDelete(medicine) },
-                            modifier = Modifier.size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Delete,
-                                contentDescription = "Delete Medicine",
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Outlined.Medication,
-                            contentDescription = "Dosage",
-                            tint = DarkGreen,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Dosage: ${medicine.dosage}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Outlined.Schedule,
-                            contentDescription = "Time",
-                            tint = DarkGreen,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = medicine.times.joinToString(", "),
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Outlined.Event,
-                            contentDescription = "Frequency",
-                            tint = DarkGreen,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        val frequencyText = medicine.frequencyType +
-                                if (medicine.frequencyType == "Specific Days" && medicine.specificDays != null) {
-                                    val dayNames = medicine.specificDays.map { dayInt ->
-                                        when (dayInt) {
-                                            Calendar.SUNDAY -> "Su"
-                                            Calendar.MONDAY -> "Mo"
-                                            Calendar.TUESDAY -> "Tu"
-                                            Calendar.WEDNESDAY -> "We"
-                                            Calendar.THURSDAY -> "Th"
-                                            Calendar.FRIDAY -> "Fr"
-                                            Calendar.SATURDAY -> "Sa"
-                                            else -> ""
-                                        }
-                                    }
-                                    " (${dayNames.joinToString(", ")})"
-                                } else ""
-                        Text(
-                            text = frequencyText,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-
-
-                medicine.currentQuantity?.let {
-                    if (it <= (medicine.refillThreshold ?: 0)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Outlined.Warning,
-                                contentDescription = "Low Stock Warning",
-                                tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Low on stock: $it doses left",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.error,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-            }
-
-
-            Button(
-                onClick = { onMarkTaken(medicine) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = DarkGreen)
-            ) {
-                Icon(
-                    Icons.Default.CheckCircle,
-                    contentDescription = "Mark Taken",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Mark as Taken")
-            }
-        }
-    }
-}
